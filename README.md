@@ -21,4 +21,4 @@ The process
 6. Develop logic/work flow
 7. Develop code
 8. Test 
-9 .Implement solution
+9. Implement solution
