@@ -46,9 +46,41 @@ NYPDfile <- read.csv("./data/NYPD_Motor_Vehicle_Collisions_Official.CSV")
 
 Please find below the process we have used to solve the proposed business problem:
 
-**1. Defining business problem.** As described above, our intentions are to analyze and identify patterns concerning car accidents in the city of New York. We visualize our final output, for this project, as a tool that will indicate, on a simple scale, the danger of a certain postal code given a certain day of the week and time.
+**1. Defining business problem.** 
 
-**2. Data undestanding.** We have downloaded open source data from the following site:
+As described above, our intentions are to analyze and identify patterns concerning car accidents in the city of New York. We visualize our final output, for this project, as a tool that will indicate, on a simple scale, the danger of a certain postal code given a certain day of the week and time.
+
+**2. Find data.** 
+
+Find a good and reliable source of data.
+
+**3. Undestand the data.** 
+
+It is important to understand the data we have at hand before trying to manipulate it. We will describe the columns on the tabels as a part of this process.
+Depending on our findings we may have to prepare the data set for modeling:
+
++ Check for missing values, exclusion of corresponding observations.
++ Check for outliers, decision on their participation in analysis.
++ Conversion of non-numerical attributes to numerical dummy variables.
++ Range normalization (if required).
++ Dimensionality reduction (if required).
++ Separation of dataset into training and test.
+
+Part of understanding the data will involve running the following tests:
+i.	Analyze data quantitatively (how many zip.codes we have, for example)
+ii.	Average number of people who die in accident
+iii.	What's the mean, what's the standard deviation of the numerical data
+
+Visualizing the data will also be part of this stage, where will will try to check if we can see any of the following trends:
+
+i.	Neighborhoods with most accidents
+ii. Day of the week with most accidents
+iii.	Time of the day with most accidents
+iv.	Type of car involved in most accidents
+
+
+
+We have downloaded open source data from the following site:
 (https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95).
 
 Each line of the table represents an incident involving a motor car vehicle in NYC from [xxx] to [xxx].
@@ -84,16 +116,10 @@ Please find below a breif description of the columns:
 28. VEHICLE.TYPE.CODE.4 (Plain text)          
 29. VEHICLE.TYPE.CODE.5 (Plain text)         
 
-**3. Data preparation.** Preparation of the dataset for subsequent modeling.
 
-+ Check for missing values, exclusion of corresponding observations.
-+ Check for outliers, decision on their participation in analysis.
-+ Conversion of non-numerical attributes to numerical dummy variables.
-+ Range normalization (if required).
-+ Dimensionality reduction (if required).
-+ Separation of dataset into training and test.
+**4. Define business criteria.**  
 
-**4. Modelling.** Building the predictive model based on training dataset with target attribute answering the chosen business question. 
+We will have to 
 
 For classification trees methodology, modelling process include following steps.
 
@@ -141,6 +167,7 @@ Below is summary of project dataset structure.
 ```{r}
 colnames(NYPDfile)
 nrow(NYPDfile)
+ncol(NYPDfile)
 ```
 
 ## Distributions of variables {.tabset}
@@ -148,7 +175,7 @@ nrow(NYPDfile)
 First, let's generate summary report for all variables.
 
 ```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---summary(HR)
+summary(NYPDfile)
 ```
 
 We will visualize distributions of variables separately for people who left the company and who stayed to be able to see differences between these groups of people on charts before doing the actual modelling.
