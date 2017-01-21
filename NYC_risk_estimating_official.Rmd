@@ -4,8 +4,6 @@ author: Andy Areitio, Claudia Kampbel, Pedro B Franco (INSEAD MBA Class of July 
   Jorge Bravo
 date: "January 31, 2017"
 output:
-  pdf_document:
-    toc: yes
   html_document:
     css: Styles/default.css
     theme: paper
@@ -13,6 +11,8 @@ output:
     toc_float:
       collapsed: no
       smooth_scroll: yes
+  pdf_document:
+    toc: yes
 ---
 
 # Project Objective:
@@ -39,6 +39,9 @@ NYPDfile <- read.csv("./data/NYPD_Motor_Vehicle_Collisions_Official.CSV")
 # all packages sould be listed inside install_load()
 #---source("./library.R")
 #---install_load("ggplot2", "corrplot", "caret", "C50", "cwhmisc", "stringr", "gmodels")
+
+head(NYPDfile, n = 5)
+tail(NYPDfile, n = 5)
 
 ```
 
@@ -110,6 +113,11 @@ We have downloaded open source data from the following site:
 Each line of the table represents an incident involving a motor car vehicle in NYC from [FIND DATES] to [FIND DATES].
 
 Please find below a breif description of the columns:
+
+```{r , echo=TRUE, message=FALSE, warning=FALSE}
+str(NYPDfile)
+```
+
 +1. DATE (Floating Time Stamp) - Date of the incident
 +2. TIME (Text) - Time the incident occured
 +3. BOROUGH (Text) - The Bourough the accident occured
@@ -139,6 +147,16 @@ Please find below a breif description of the columns:
 +27. VEHICLE.TYPE.CODE.3 (Plain text)         
 +28. VEHICLE.TYPE.CODE.4 (Plain text)          
 +29. VEHICLE.TYPE.CODE.5 (Plain text)    
+
+```{r , echo=TRUE, message=FALSE, warning=FALSE}
+unique(NYPDfile$BOROUGH)
+unique(NYPDfile$ZIP.CODE)
+unique(NYPDfile$NUMBER.OF.PERSONS.INJURED)
+unique(NYPDfile$NUMBER.OF.PERSONS.KILLED)
+unique(NYPDfile$VEHICLE.TYPE.CODE.1)
+```
+
+
 +Below is summary of project dataset structure.
 
 ```{r}
@@ -155,12 +173,7 @@ First, let's generate summary report for all variables.
 summary(NYPDfile)
 ```
 
-We will visualize distributions of variables separately for people who left the company and who stayed to be able to see differences between these groups of people on charts before doing the actual modelling.
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---HR.left <- subset(HR, left == 1)
-#---HR.stayed <- subset(HR, left == 0)
-```
+We will perform some tests with the data.
 
 There are [ ] observations of employees who left the company and [ ] observations of employees who stayed.
 
