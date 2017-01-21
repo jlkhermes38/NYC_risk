@@ -110,36 +110,36 @@ We have downloaded open source data from the following site:
 Each line of the table represents an incident involving a motor car vehicle in NYC from [FIND DATES] to [FIND DATES].
 
 Please find below a breif description of the columns:
-1. DATE (Floating Time Stamp) - Date of the incident
-2. TIME (Text) - Time the incident occured
-3. BOROUGH (Text) - The Bourough the accident occured
-4. ZIP.CODE (Text) - The Zipcode of the location
-5. LATITUDE (Number #) - Latitude of the location the accident occured
-6. LONGITUDE (Number #) - Longitude of the location the accident occured
-7. LOCATION (Location Datatype) - Location, where logitude and latitude are joined and can be refferenced to a map
-8. ON.STREET.NAME (Plain text) - Name of the street the accident occured                
-9. CROSS.STREET.NAME (Plain text) - Closest cross street           
-10. OFF.STREET.NAME (Plain text)               
-11. NUMBER.OF.PERSONS.INJURED (Number #) - Total number of injured in accident    
-12. NUMBER.OF.PERSONS.KILLED (Number #) - Total number of fatalities     
-13. NUMBER.OF.PEDESTRIANS.INJURED (Number #) - Pedestrians injured
-14. NUMBER.OF.PEDESTRIANS.KILLED (Number #) - Pedestrian fatalities  
-15. NUMBER.OF.CYCLIST.INJURED (Number #) - Cyclists injured  
-16. NUMBER.OF.CYCLIST.KILLED (Number #) - Cyclists with fatalities    
-17. NUMBER.OF.MOTORIST.INJURED (Number #) - Motorists injured  
-18. NUMBER.OF.MOTORIST.KILLED (Number #) - MOtorists killed   
-19. CONTRIBUTING.FACTOR.VEHICLE.1 (Plain text) 
-20. CONTRIBUTING.FACTOR.VEHICLE.2 (Plain text)
-21. CONTRIBUTING.FACTOR.VEHICLE.3 (Plain text)
-22. CONTRIBUTING.FACTOR.VEHICLE.4 (Plain text)
-23. CONTRIBUTING.FACTOR.VEHICLE.5 (Plain text)
-24. UNIQUE.KEY  (Number #) - Unique key for the table                 
-25. VEHICLE.TYPE.CODE.1 (Plain text) - Type of Vehicle 1 (sports utility, taxi, passenger, bus, etc)         
-26. VEHICLE.TYPE.CODE.2 (Plain text)          
-27. VEHICLE.TYPE.CODE.3 (Plain text)         
-28. VEHICLE.TYPE.CODE.4 (Plain text)          
-29. VEHICLE.TYPE.CODE.5 (Plain text)    
-Below is summary of project dataset structure.
++1. DATE (Floating Time Stamp) - Date of the incident
++2. TIME (Text) - Time the incident occured
++3. BOROUGH (Text) - The Bourough the accident occured
++4. ZIP.CODE (Text) - The Zipcode of the location
++5. LATITUDE (Number #) - Latitude of the location the accident occured
++6. LONGITUDE (Number #) - Longitude of the location the accident occured
++7. LOCATION (Location Datatype) - Location, where logitude and latitude are joined and can be refferenced to a map
++8. ON.STREET.NAME (Plain text) - Name of the street the accident occured                
++9. CROSS.STREET.NAME (Plain text) - Closest cross street           
++10. OFF.STREET.NAME (Plain text)               
++11. NUMBER.OF.PERSONS.INJURED (Number #) - Total number of injured in accident    
++12. NUMBER.OF.PERSONS.KILLED (Number #) - Total number of fatalities     
++13. NUMBER.OF.PEDESTRIANS.INJURED (Number #) - Pedestrians injured
++14. NUMBER.OF.PEDESTRIANS.KILLED (Number #) - Pedestrian fatalities  
++15. NUMBER.OF.CYCLIST.INJURED (Number #) - Cyclists injured  
++16. NUMBER.OF.CYCLIST.KILLED (Number #) - Cyclists with fatalities    
++17. NUMBER.OF.MOTORIST.INJURED (Number #) - Motorists injured  
++18. NUMBER.OF.MOTORIST.KILLED (Number #) - MOtorists killed   
++19. CONTRIBUTING.FACTOR.VEHICLE.1 (Plain text) 
++20. CONTRIBUTING.FACTOR.VEHICLE.2 (Plain text)
++21. CONTRIBUTING.FACTOR.VEHICLE.3 (Plain text)
++22. CONTRIBUTING.FACTOR.VEHICLE.4 (Plain text)
++23. CONTRIBUTING.FACTOR.VEHICLE.5 (Plain text)
++24. UNIQUE.KEY  (Number #) - Unique key for the table                 
++25. VEHICLE.TYPE.CODE.1 (Plain text) - Type of Vehicle 1 (sports utility, taxi, passenger, bus, etc)         
++26. VEHICLE.TYPE.CODE.2 (Plain text)          
++27. VEHICLE.TYPE.CODE.3 (Plain text)         
++28. VEHICLE.TYPE.CODE.4 (Plain text)          
++29. VEHICLE.TYPE.CODE.5 (Plain text)    
++Below is summary of project dataset structure.
 
 ```{r}
 colnames(NYPDfile)
