@@ -78,12 +78,36 @@ ii. Day of the week with most accidents
 iii.	Time of the day with most accidents
 iv.	Type of car involved in most accidents
 
+**4. Define business criteria.**  
 
+We will have to define the following:
+
++ Criteria for dangerous routes
++ Define a scale to measure risk
++ Define the influence radius of an accident
+
+**5. Prepare and model solution.**
+
++ Choose the columns/criteria that make more sense (dimensionality reduction)
++ Develop logic/workflow
++ Develop code
+
+**6. Test and Deploy.** Test the solution and conclude the project. Conclude the project and add comments on how to improve the solution.
+
+# Business Understanding
+
+Our conclusions can be useful to insurance companies or even to waze-type platforms, which  would be able to charge insurance companies by the mile driven and in the later case, offer a safer rout for users.
+
+# Data Understanding
+
+## Source of data
 
 We have downloaded open source data from the following site:
 (https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95).
 
-Each line of the table represents an incident involving a motor car vehicle in NYC from [xxx] to [xxx].
+## Dataset size and variables
+
+Each line of the table represents an incident involving a motor car vehicle in NYC from [FIND DATES] to [FIND DATES].
 
 Please find below a breif description of the columns:
 1. DATE (Floating Time Stamp) - Date of the incident
@@ -114,54 +138,7 @@ Please find below a breif description of the columns:
 26. VEHICLE.TYPE.CODE.2 (Plain text)          
 27. VEHICLE.TYPE.CODE.3 (Plain text)         
 28. VEHICLE.TYPE.CODE.4 (Plain text)          
-29. VEHICLE.TYPE.CODE.5 (Plain text)         
-
-
-**4. Define business criteria.**  
-
-We will have to 
-
-For classification trees methodology, modelling process include following steps.
-
-+ Choice of methodology and tool.
-+ First application of tool to dataset.
-+ Generation of decision tree visualization, decision on simplification possibility.
-+ Simplification of the model if possible.
-+ Preliminary evaluation of the model using confusion matrix and test dataset. Decision to proceed (if evaluation results are satisfactory) or repeating the modelling process.
-
-**5. Evaluation.** Check of models predictive accuracy on test dataset.
-
-+ Generation of confusion matrix using built model and test dataset.
-+ Decision on accepting the model or repeating the modelling process.
-
-**6. Deployment.** Conclusion on project results and description of potential deployment of built model in practice. Remarks about potential ways to improve process and model of this project.
-
-
-# Business Understanding
-
-People are the most important resource for a lot of companies. And employees turnover has always been one of major HR issues. Retaining workers is becoming a balancing act between hard data research and a human touch. It’s more important than ever to complement intuition with statistical analysis (more on this available, for example on [INSEAD Knowledge](http://knowledge.insead.edu/blog/insead-blog/the-art-of-keeping-employees-from-leaving-3896).
-
-Business problem that this project intends to solve is **prediction of employees to leave in near future using attributes known about each of employees**.
-
-# Data Understanding
-
-## Source of data
-
-For this project we use dataset 'Human Resources Analytics' published by Ludovic Benistant on kaggle ([source](https://www.kaggle.com/ludobenistant/hr-analytics/)) under CC BY-SA 4.0 License. 
-
-## Dataset size and variables
-
-+ Employee satisfaction level *(satisfaction_level)*
-+ Last evaluation *(last_evaluation)*
-+ Number of projects *(number_project)*
-+ Average monthly hours *(average_montly_hours)*
-+ Time spent at the company *(time_spend_company)*
-+ Whether they have had a work accident *(Work_accident)*
-+ Whether they have had a promotion in the last 5 years *(promotion_last_5years)*
-+ Department *(sales)*
-+ Salary *(salary)*
-+ Whether the employee has left, the target variable in this project *(left)*
-
+29. VEHICLE.TYPE.CODE.5 (Plain text)    
 Below is summary of project dataset structure.
 
 ```{r}
