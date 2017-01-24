@@ -21,7 +21,7 @@ We intend to analyze and identify patterns regarding car accidents in New York C
  
 Discalimer: Please note that in order to run this project on a local computer, you will have do download the files in the GITHUB repository and extract the CSV file from the NYPD_Motor_Vehicle_Collisions_2.csv.zip
 
-Please name the file: data/NYPD_Motor_Vehicle_Collisions_Official.CSV
+Please name the file: Data/NYPD_Motor_Vehicle_Collisions_Official.csv
 
 Thank you!
 
@@ -32,16 +32,27 @@ Thank you!
 rm(list = ls())
 
 # load the dataset for the project
-NYPDfile <- read.csv("./data/NYPD_Motor_Vehicle_Collisions_Official.CSV")
+NYPDfile <- read.csv("Data/NYPD_Motor_Vehicle_Collisions.csv", header = TRUE, stringsAsFactors = FALSE)
+
+#####
+#JB: I added header = TRUE  and "stringsAsFactors = FALSE", because I want to look at the variables represented by character strings
+#print(colnames(ProjectData))
+
+#####
 
 # load required packages
 # install required packages if loading failed
 # all packages sould be listed inside install_load()
-#---source("./library.R")
-#---install_load("ggplot2", "corrplot", "caret", "C50", "cwhmisc", "stringr", "gmodels")
+if (!require("ggplot2")) {
+  install.packages("ggplot2", repos="http://cran.rstudio.com/") 
+  library("ggplot2")
+}
 
-head(NYPDfile, n = 5)
-tail(NYPDfile, n = 5)
+## JB: necessary for you, but not really for the report
+#head(NYPDfile, n = 5)
+#tail(NYPDfile, n = 5)
+
+###
 
 ```
 
@@ -76,18 +87,18 @@ iii.	What's the mean, what's the standard deviation of the numerical data
 
 Visualizing the data will also be part of this stage, where will will try to check if we can see any of the following trends:
 
-i.	Neighborhoods with most accidents
-ii. Day of the week with most accidents
-iii.	Time of the day with most accidents
-iv.	Type of car involved in most accidents
+i.	Zip Codes with most accidents
+ii. Zip Codes with most deaths
+iii.	Zip Codes with most injuries
+iv. Histograms with the most frequent type of accident (type = # injuries or deaths) 
+v. Histograms with accidents per borough
 
 **4. Define business criteria.**  
 
 We will have to define the following:
 
-+ Criteria for dangerous routes
-+ Define a scale to measure risk
-+ Define the influence radius of an accident
++ Define a method for rating the accidents (i.e. rows) using URS - Universal Rating System (for accidents)
++ Criteria for dangerous zip codes (scaling URS)
 
 **5. Prepare and model solution.**
 
@@ -116,6 +127,10 @@ Please find below a breif description of the columns:
 
 ```{r , echo=TRUE, message=FALSE, warning=FALSE}
 str(NYPDfile)
+
+###### JB: maybe to avoid this if the summary is alredy printed below. You could also put only the explanation of variables that
+# are not self-explicative 
+
 ```
 
 +1. DATE (Floating Time Stamp) - Date of the incident
@@ -148,277 +163,112 @@ str(NYPDfile)
 +28. VEHICLE.TYPE.CODE.4 (Plain text)          
 +29. VEHICLE.TYPE.CODE.5 (Plain text)    
 
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-unique(NYPDfile$BOROUGH)
-unique(NYPDfile$ZIP.CODE)
-unique(NYPDfile$NUMBER.OF.PERSONS.INJURED)
-unique(NYPDfile$NUMBER.OF.PERSONS.KILLED)
-unique(NYPDfile$VEHICLE.TYPE.CODE.1)
-```
-
+First, let's generate summary report for all variables.
 
 +Below is summary of project dataset structure.
 
-```{r}
-colnames(NYPDfile)
+```{r , echo=TRUE, message=FALSE, warning=FALSE}
+
+#colnames(NYPDfile)
 nrow(NYPDfile)
 ncol(NYPDfile)
-```
-
-## Distributions of variables {.tabset}
-
-First, let's generate summary report for all variables.
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
 summary(NYPDfile)
+
+## JB: What can you see of summary is that there are a lot of NA's in certain data which could be difficult to use or if used, 
+# it should be specified that there are many rows that are taken off. Maybe analying if there is a relation between a particular
+# kind of accident and zip.code is written?
+
+# another interesting thing is that 'Date' and 'Time' columns are defined as character and not numerical, which will be a problem to visualization
 ```
 
-We will perform some tests with the data.
-
-There are [ ] observations of employees who left the company and [ ] observations of employees who stayed.
-
-### Satisfaction level
 
 ```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.left, aes(HR.left$satisfaction_level)) + geom_density(kernel = "gaussian", fill = '#B8274C', alpha = 0.3) + labs(x = "Satisfaction level of employees who left") + xlim(0, 1)
-```
 
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$satisfaction_level)) + geom_density(kernel = "gaussian", fill = '#006E51', alpha = 0.3) + labs(x = "Satisfaction level of employees who stayed") + xlim(0, 1)
-```
+#analyzing categorical variables and unique values
+sapply(NYPDfile, function(x) length(unique(x)))
 
-### Last evaluation
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.left, aes(HR.left$last_evaluation)) + geom_density(kernel = "gaussian", fill = '#B8274C', alpha = 0.3) + labs(x = "Last evaluation of employees who left") + xlim(0, 1)
-```
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$last_evaluation)) + geom_density(kernel = "gaussian", fill = '#006E51', alpha = 0.3) + labs(x = "Last evaluation of employees who stayed") + xlim(0, 1)
-```
-
-### Number of projects
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.left, aes(HR.left$number_project)) + geom_histogram(fill = '#B8274C', binwidth = .5) + scale_x_continuous(breaks = seq(0,max(max(HR.left$number_project),max(HR.stayed$number_project)),by = 1), limits = c(0, max(max(HR.left$number_project),max(HR.stayed$number_project))+1)) + labs(x = "Number of projects of employees who left")
+#zooming in one column
+ unique(NYPDfile$BOROUGH)
+ 
+ ### JB: we see that the main variable to use is the Borough. However Borough has a lot of unknowns.  zip code is complicated due to the big number (maybe a way of splitting if the zip codes in NY follow a rule and they can be used to disaggreagte the information of a Borough). Cross.Street.Name and Off.Stree.name have too many categories and Contributing.facto.Vehicles also in that case. Vehicle.Type.Code why not? 
+ 
 ```
 
 ```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$number_project)) + geom_histogram(fill = '#006E51', binwidth = .5) + scale_x_continuous(breaks = seq(0,max(max(HR.left$number_project),max(HR.stayed$number_project)),by = 1), limits = c(0, max(max(HR.left$number_project),max(HR.stayed$number_project))+1)) + labs(x = "Number of projects of employees who stayed")
+
+#histogram
+
+NYPDdata <- NYPDfile$UNIQUE.KEY
+NYPDdata <- cbind(NYPDdata, NYPDfile$BOROUGH)
+colnames(NYPDdata) <- c("ID", "BOROUGH")
+
+NYPDdata[,"BOROUGH"] <- replace(NYPDdata[,"BOROUGH"], NYPDdata[,"BOROUGH"]=="", 0)
+NYPDdata[,"BOROUGH"] <- replace(NYPDdata[,"BOROUGH"], NYPDdata[,"BOROUGH"]=="BRONX", 1)
+NYPDdata[,"BOROUGH"] <- replace(NYPDdata[,"BOROUGH"], NYPDdata[,"BOROUGH"]=="BROOKLYN", 2)
+NYPDdata[,"BOROUGH"] <- replace(NYPDdata[,"BOROUGH"], NYPDdata[,"BOROUGH"]=="MANHATTAN", 3)
+NYPDdata[,"BOROUGH"] <- replace(NYPDdata[,"BOROUGH"], NYPDdata[,"BOROUGH"]=="QUEENS", 4)
+NYPDdata[,"BOROUGH"] <- replace(NYPDdata[,"BOROUGH"], NYPDdata[,"BOROUGH"]=="STATEN ISLAND", 5)
+
+NYPDdata<-matrix(as.numeric(unlist(NYPDdata)),nrow=nrow(NYPDdata))
+colnames(NYPDdata) <- c("ID", "BOROUGH")
+
+#hist(NYPDdata[,"BOROUGH"])
+# the histogram shows that something has to be done with class "0" of unkowns
+
+
+
 ```
 
-### Monthly hours
+## Dataset visualization
 
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.left, aes(HR.left$average_montly_hours)) + geom_density(kernel = "gaussian", fill = '#B8274C', alpha = 0.3) + labs(x = "Average monthly hours of employees who left") + xlim(min( min(HR.left$average_montly_hours), min(HR.stayed$average_montly_hours)), max( max(HR.left$average_montly_hours), max(HR.stayed$average_montly_hours)))
-```
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$average_montly_hours)) + geom_density(kernel = "gaussian", fill = '#006E51', alpha = 0.3) + labs(x = "Average monthly hours of employees who stayed") + xlim(min( min(HR.left$average_montly_hours), min(HR.stayed$average_montly_hours)), max( max(HR.left$average_montly_hours), max(HR.stayed$average_montly_hours)))
-```
-
-### Time at company
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.left, aes(HR.left$time_spend_company)) + geom_histogram(fill = '#B8274C', binwidth = .5) + scale_x_continuous(breaks = seq(0,max(max(HR.left$time_spend_company),max(HR.stayed$time_spend_company)),by = 1), limits = c(0, max(max(HR.left$time_spend_company),max(HR.stayed$time_spend_company))+1)) + labs(x = "Time spent at the company (in years) of employees who left")
-```
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$time_spend_company)) + geom_histogram(fill = '#006E51', binwidth = .5) + scale_x_continuous(breaks = seq(0,max(max(HR.left$time_spend_company),max(HR.stayed$time_spend_company)),by = 1), limits = c(0, max(max(HR.left$time_spend_company),max(HR.stayed$time_spend_company))+1)) + labs(x = "Time spent at the company (in years) of employees who stayed")
-```
-
-### Work accidents 
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.left, aes(HR.left$Work_accident)) + geom_histogram(fill = '#B8274C', binwidth = .5) + labs(x = "Number of employees who experienced and did not experience work accident of employees who left")
-```
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$Work_accident)) + geom_histogram(fill = '#006E51', binwidth = .5) + labs(x = "Number of employees who experienced and did not experience work accident of employees who stayed")
-```
-
-### Promotions 
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.left, aes(HR.left$promotion_last_5years)) + geom_histogram(fill = '#B8274C', binwidth = .5) + labs(x = "Number of employees who were or were not promoted during last 5 years of employees who left")
-```
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$promotion_last_5years)) + geom_histogram(fill = '#006E51', binwidth = .5) + labs(x = "Number of employees who were or were not promoted during last 5 years of employees who stayed")
-```
-
-### Department
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---Departments <- c("sales", "technical", "support", "IT", "product_mng", "marketing", "RandD", "accounting", "hr","management")
-#---ggplot(HR.left, aes(HR.left$sales)) + geom_bar(stat = "count", fill = '#B8274C') + labs(x = "Department of employees who left") + scale_x_discrete(limits = Departments)
-```
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$sales)) + geom_bar(stat = "count", fill = '#006E51') + labs(x = "Department of employees who stayed") + scale_x_discrete(limits = Departments)
-```
-
-### Salary
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.left, aes(HR.left$salary)) + geom_bar(stat = "count", fill = '#B8274C') + labs(x = "Salary level of employees who left") + scale_x_discrete(limits = c("low", "medium", "high"))
-```
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ggplot(HR.stayed, aes(HR.stayed$salary)) + geom_bar(stat = "count", fill = '#006E51') + labs(x = "Salary level of employees who stayed") + scale_x_discrete(limits = c("low", "medium", "high"))
-```
-
-## Correlations
-
-Let's check correlations between variables.
+1. Plot a graph with accidents per borough (independent of time and date):
 
 ```{r}
-#---CorTable <- cor(HR[,1:8])
-#---corrplot(CorTable, method = "number", type= "upper")
+
 ```
 
-# Data preparation
+2. Plot simple graphs (independent of time and date and ordered from largest # of accidents to smallest): 
+a. Accidents per zip code
+b. Deaths per zip code
+c. Injuries per zip code
 
-## Check for missing values
+```{r}
 
-Let's count missing values in the dataset.
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---sum(is.na(HR))
 ```
 
-Since we don't have missing values, there is no need to exclude any observations from the dataset.
+3. Plot a histogram with accidents per zip code using the following criteria (ind. of time and date):
++ X Axis: number of accidents (histogram divided into 10 equal intervals depending on the number of max. accidents found in graph 2 - above)
++ Y Axis: number of zip codes that fall into each of the intervals defined in the x-axis
 
-## Check for outliers
+```{r}
 
-Graphical analysis of variables' distributions done on Data Understanding step did not show any suspicious outliers.
-
-## Creation of dummy variables
-
-Previously we identified, that two variables are categorical now: Department and Salary. Now we convert them to dummy variables, creating two dummy variables for Salary and nine dummy variables for Department.
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---dummy <- dummyVars(" ~ .", data = HR, fullRank = TRUE)
-#---HR.dm <- data.frame(predict(dummy, newdata = HR))
-#---str(HR.dm)
 ```
 
-## Range normalization
+## Define Business Criteria
 
-Classification tree methodology does not require scale normalization of input data, so we do not perform this step.
+In an attempt to create a "traffic light" system for the zip codes in New York we decided to rate every accident using the following criteria:
++ Every row is a collision and receives 1 point
++ Every injury the row receives 2 points (# of injuries in the row * 3) - Column name do be used: 11. NUMBER.OF.PERSONS.INJURED    
++ Every death the row receives 6 points - Column name to be used: 12. NUMBER.OF.PERSONS.KILLED 
 
-## Dimensionality reduction
+A new column with the above point system will be created and called ("URS" = Universal Rating System (for accidents))
 
-Having small number of variables, we decided to avoid dimensionality reduction. 
+```{r}
 
-## Correction of variables format
-
-For using classification tree methodology, we convert part of variables to factor type.
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---columns_to_factors <- c(6:19)
-#---HR.dm[,columns_to_factors] <- lapply(HR.dm[,columns_to_factors], factor)
-#---str(HR.dm)
 ```
 
-## Separation into training and test datasets
+A. Plot simple graph of URS per zip code
 
-Let's separate dataset into 80% training dataset and 20% test dataset.
+```{r}
 
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---set.seed(777)
-#---train.index <- createDataPartition(HR$left, p = .8, list = FALSE, times = 1)
-#---TrainDS <- HR.dm[ train.index, ]
-#---TestDS  <- HR.dm[-train.index, ]
 ```
 
-There are observations in training dataset and observations in test dataset.
+B. Plot a histogram with URS per zip code using the following criteria:
++ X Axis: number of URS (histogram divided into 10 equal intervals depending on the number of max. URS found in graph A - above)
++ Y Axis: number of zip codes that fall into each of the intervals defined in the x-axis
 
-We can check that both datasets are roughly similar in distribution of target variable (whether employee left).
+```{r}
 
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---round(prop.table(table(TrainDS$left)),3)
-#---round(prop.table(table(TestDS$left)),3)
 ```
 
-# Modelling: Decision Tree
-
-## Choice of methodology and tool
-
-Possible methodologies for solving classification problems include logistic regression, support vector machine, decision tree, Naive Bayes classification, k-nearest neighbor. For the purpose of this exercise we will use decision tree methodology. It should provide an output in a form of clear set of rules, that should be easy to communicate to management and easy to implement (for example, in company's HR system).
-
-Our model should predict categorical response variable (if employee leaves) with two possible outcomes: yes (1) or no (0). For that reason, decision tree should be a classification tree. 
-
-There are many packages in R for modeling decision trees: for example, rpart, party, RWeka, ipred, randomForest, gbm, C5.0. C5.0 is one of most up-to-date algorithms with following advantages ([source](http://en.proft.me/2016/11/9/classification-using-decision-trees-r/)):
-
-+ An all-purpose classifier that does well on most problems.
-+ Highly automatic learning process, which can handle numeric or nominal features, as well as missing data.
-+ Less data cleaning required.
-+ Excludes unimportant features.
-+ Can be used on both small and large datasets.
-+ Non parametric method (have no assumptions about the space distribution and the classifier structure).
-+ Results in a model that can be interpreted without a mathematical background (for relatively small trees).
-+ More efficient than other complex models.
-
-C4.5, which was a C5.0 predecessor, became quite popular after ranking #1 in the Top 10 Algorithms in Data Mining pre-eminent paper published by Springer LNCS in 2008 ([source](https://en.wikipedia.org/wiki/C4.5_algorithm)). Taking all advantages into account, we are using C5.0 algorithm for the modelling.
-
-C5.0 builds decision trees from a set of training data using the concept of information entropy. At each node of the tree, C5.0 chooses the attribute of the data that most effectively splits its set of samples into subsets enriched in one class or the other. The splitting criterion is the normalized information gain (difference in entropy). The attribute with the highest normalized information gain is chosen to make the decision. The C5.0 algorithm then recurs on the smaller sublists.
-
-## First application of tool to dataset
-
-For a first iteration, we apply C5.0 algorithm to the whole training dataset. Variable "Leave" serves as target variables and all other variables - as predictors. After the initial modelling we'll see which predicting variables are less helpful in predicting leave of employees and can be removed from modelling process.
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ClTree1 <- C5.0(TrainDS[-7],TrainDS$left)
-#---summary(ClTree1)
-```
-
-## Simplification of the model
-
-As we see from results of the first iteration, only five variables are mainly used by the model for making sufficiently precise prediction: average_montly_hours; satisfaction_level;	time_spend_company;	last_evaluation; number_project.
-
-We will build a model only with these variables and will later evaluate performance of this simplified model on test dataset.
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---ClTree2 <- C5.0(TrainDS[c(4, 1, 5, 2, 3)],TrainDS$left)
-#---summary(ClTree2)
-```
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE, results='hide'}
-# save results of modeling to .txt file
-# data saved in file enables visualization of tree using free GraphViz software
-# GraphViz can be installed from http://www.graphviz.org/
-#---C5.0.graphviz(ClTree2, './/Tree2.txt')
-```
-
-# Evaluation
-
-To evaluate the model we apply it to test dataset and build the confusion matrix of results. It shows how many mistakes of different type the model does and how many observations are classified correctly.
-
-```{r , echo=TRUE, message=FALSE, warning=FALSE}
-#---PredictionTree <- predict(ClTree2, TestDS)
-#---CT.Tree <- CrossTable(TestDS$left, PredictionTree, prop.chisq = FALSE, prop.c = FALSE, prop.r = FALSE, dnn = c('actual leave', 'predicted leave'))
-#---CT.Tree.DF <- as.data.frame(CT.Tree)
-```
-
-As we can see from the table, for [ ] out of [ ] observations in test dataset model correctly predicted if employee will leave. This includes [ ] observations where model correctly predicted that employee will not leave and [ ] observation where model correctly predicted leave. Thus [ ] observations from test dataset were classified correctly.
-
-Dataset was initially imbalanced ([ ] of all employees in dataset did not leave). Even that we already see significant information gain vs random gassing from conclusion above, let's check how successfully model identifies observations of both positive and negative target variable.
-
-Model correctly identified [ ]% of positive observations (the ones where employee left). Only [ ] of employees who in fact left were not identified by the model.
-
-Model also correctly identified [ ]% of negative observations. Only for [ ] of employees model generated false positive prediction.
-
-
-# Deployment
-
-As a result of the project, we built a model that proved to be a successful predictor of possible leave of employees. It turned out, that most powerful predictors of leave are working hours, satisfaction level, time spent at company, last evaluation, and number of projects. But this data should be used in a systematic logical way, described by decision tree we built - none of variables along can not predict a leave (this we saw from correlation analysis at the beginning).
-
-Should this model be deployed in a real business environment, it can be integrated into HR IT system - letting know HR and line managers about risk of each of employees' leave. Being implemented in HR system, it can also generate a report, which signs were used by the algorithm to predict the leave (is it because employee work critically long hours or because of combination of big number of projects and low satisfaction?).
-
-Potential ways to improve this project include the following.
-
-+ It's possible to build predictive models using other methodologies and tools, in order to find ways to improve predictive power even further.
-+ It makes sense to integrate estimation of employee's value for the company in the model - so that company will try to stop from leaving only employees who generate enough positive results.
-+ Tool can be further improved to advice HR manager what parameters of employee's work-life should be changes the first in order to decrease risk of leaving most significantly.
 ***
