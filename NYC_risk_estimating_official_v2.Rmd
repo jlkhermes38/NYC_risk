@@ -1,0 +1,228 @@
+---
+title: "Measuring Risk in NYC"
+author: Andy Areitio, Claudia Kampbel, Pedro B Franco (INSEAD MBA Class of July 2017);
+  Jorge Bravo
+date: "January 31, 2017"
+output:
+  html_document:
+    css: Styles/default.css
+    theme: paper
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document:
+    toc: yes
+---
+
+# Project Objective:
+
+We intend to analyze and identify patterns regarding car accidents in New York City ("NYC"). In order to acheive this objective we have obtained from the New York Police Department ("NYPD") open source data with almost two years of accidents. The table has 29 columns containing details on each accident reported to the NYPD in these two years.
+ 
+Discalimer: Please note that in order to run this project on a local computer, you will have do download the files in the GITHUB repository and extract the CSV file from the NYPD_Motor_Vehicle_Collisions_2.csv.zip
+
+Please name the file: data/NYPD_Motor_Vehicle_Collisions_Official.CSV
+
+Thank you!
+
+```{r , echo=TRUE, message=FALSE, warning=FALSE}
+# basic preparatory commands
+
+# clear the working environment
+rm(list = ls())
+
+# load the dataset for the project
+NYPDfile <- read.csv("./data/NYPD_Motor_Vehicle_Collisions_Official.CSV")
+
+# load required packages
+# install required packages if loading failed
+# all packages sould be listed inside install_load()
+#---source("./library.R")
+#---install_load("ggplot2", "corrplot", "caret", "C50", "cwhmisc", "stringr", "gmodels")
+
+head(NYPDfile, n = 5)
+tail(NYPDfile, n = 5)
+
+```
+
+## Project process and document structure
+
+Please find below the process we have used to solve the proposed business problem:
+
+**1. Defining business problem.** 
+
+As described above, our intentions are to analyze and identify patterns concerning car accidents in the city of New York. We visualize our final output, for this project, as a tool that will indicate, on a simple scale, the danger of a certain postal code given a certain day of the week and time.
+
+**2. Find data.** 
+
+Find a good and reliable source of data.
+
+**3. Undestand the data.** 
+
+It is important to understand the data we have at hand before trying to manipulate it. We will describe the columns on the tabels as a part of this process.
+Depending on our findings we may have to prepare the data set for modeling:
+
++ Check for missing values, exclusion of corresponding observations.
++ Check for outliers, decision on their participation in analysis.
++ Conversion of non-numerical attributes to numerical dummy variables.
++ Range normalization (if required).
++ Dimensionality reduction (if required).
++ Separation of dataset into training and test.
+
+Part of understanding the data will involve running the following tests:
+i.	Analyze data quantitatively (how many zip.codes we have, for example)
+ii.	Average number of people who die in accident
+iii.	What's the mean, what's the standard deviation of the numerical data
+
+Visualizing the data will also be part of this stage, where will will try to check if we can see any of the following trends:
+
+i.	Zip Codes with most accidents
+ii. Zip Codes with most deaths
+iii.	Zip Codes with most injuries
+iv. Histograms with the most frequent type of accident (type = # injuries or deaths) 
+v. Histograms with accidents per borough
+
+**4. Define business criteria.**  
+
+We will have to define the following:
+
++ Define a method for rating the accidents (i.e. rows) using URS - Universal Rating System (for accidents)
++ Criteria for dangerous zip codes (scaling URS)
+
+**5. Prepare and model solution.**
+
++ Choose the columns/criteria that make more sense (dimensionality reduction)
++ Develop logic/workflow
++ Develop code
+
+**6. Test and Deploy.** Test the solution and conclude the project. Conclude the project and add comments on how to improve the solution.
+
+# Business Understanding
+
+Our conclusions can be useful to insurance companies or even to waze-type platforms, which  would be able to charge insurance companies by the mile driven and in the later case, offer a safer rout for users.
+
+# Data Understanding
+
+## Source of data
+
+We have downloaded open source data from the following site:
+(https://data.cityofnewyork.us/Public-Safety/NYPD-Motor-Vehicle-Collisions/h9gi-nx95).
+
+## Dataset size and variables
+
+Each line of the table represents an incident involving a motor car vehicle in NYC from [FIND DATES] to [FIND DATES].
+
+Please find below a breif description of the columns:
+
+```{r , echo=TRUE, message=FALSE, warning=FALSE}
+str(NYPDfile)
+```
+
++1. DATE (Floating Time Stamp) - Date of the incident
++2. TIME (Text) - Time the incident occured
++3. BOROUGH (Text) - The Bourough the accident occured
++4. ZIP.CODE (Text) - The Zipcode of the location
++5. LATITUDE (Number #) - Latitude of the location the accident occured
++6. LONGITUDE (Number #) - Longitude of the location the accident occured
++7. LOCATION (Location Datatype) - Location, where logitude and latitude are joined and can be refferenced to a map
++8. ON.STREET.NAME (Plain text) - Name of the street the accident occured                
++9. CROSS.STREET.NAME (Plain text) - Closest cross street           
++10. OFF.STREET.NAME (Plain text)               
++11. NUMBER.OF.PERSONS.INJURED (Number #) - Total number of injured in accident    
++12. NUMBER.OF.PERSONS.KILLED (Number #) - Total number of fatalities     
++13. NUMBER.OF.PEDESTRIANS.INJURED (Number #) - Pedestrians injured
++14. NUMBER.OF.PEDESTRIANS.KILLED (Number #) - Pedestrian fatalities  
++15. NUMBER.OF.CYCLIST.INJURED (Number #) - Cyclists injured  
++16. NUMBER.OF.CYCLIST.KILLED (Number #) - Cyclists with fatalities    
++17. NUMBER.OF.MOTORIST.INJURED (Number #) - Motorists injured  
++18. NUMBER.OF.MOTORIST.KILLED (Number #) - MOtorists killed   
++19. CONTRIBUTING.FACTOR.VEHICLE.1 (Plain text) 
++20. CONTRIBUTING.FACTOR.VEHICLE.2 (Plain text)
++21. CONTRIBUTING.FACTOR.VEHICLE.3 (Plain text)
++22. CONTRIBUTING.FACTOR.VEHICLE.4 (Plain text)
++23. CONTRIBUTING.FACTOR.VEHICLE.5 (Plain text)
++24. UNIQUE.KEY  (Number #) - Unique key for the table                 
++25. VEHICLE.TYPE.CODE.1 (Plain text) - Type of Vehicle 1 (sports utility, taxi, passenger, bus, etc)         
++26. VEHICLE.TYPE.CODE.2 (Plain text)          
++27. VEHICLE.TYPE.CODE.3 (Plain text)         
++28. VEHICLE.TYPE.CODE.4 (Plain text)          
++29. VEHICLE.TYPE.CODE.5 (Plain text)    
+
+```{r , echo=TRUE, message=FALSE, warning=FALSE}
+unique(NYPDfile$BOROUGH)
+unique(NYPDfile$ZIP.CODE)
+unique(NYPDfile$NUMBER.OF.PERSONS.INJURED)
+unique(NYPDfile$NUMBER.OF.PERSONS.KILLED)
+unique(NYPDfile$VEHICLE.TYPE.CODE.1)
+```
+
+
++Below is summary of project dataset structure.
+
+```{r}
+colnames(NYPDfile)
+nrow(NYPDfile)
+ncol(NYPDfile)
+```
+
+## Distributions of variables {.tabset}
+
+First, let's generate summary report for all variables.
+
+```{r , echo=TRUE, message=FALSE, warning=FALSE}
+summary(NYPDfile)
+```
+
+## Dataset visualization
+
+1. Plot a graph with accidents per borough (independent of time and date):
+
+```{r}
+
+```
+
+2. Plot simple graphs (independent of time and date and ordered from largest # of accidents to smallest): 
+a. Accidents per zip code
+b. Deaths per zip code
+c. Injuries per zip code
+
+```{r}
+
+```
+
+3. Plot a histogram with accidents per zip code using the following criteria (ind. of time and date):
++ X Axis: number of accidents (histogram divided into 10 equal intervals depending on the number of max. accidents found in graph 2 - above)
++ Y Axis: number of zip codes that fall into each of the intervals defined in the x-axis
+
+```{r}
+
+```
+
+## Define Business Criteria
+
+In an attempt to create a "traffic light" system for the zip codes in New York we decided to rate every accident using the following criteria:
++ Every row is a collision and receives 1 point
++ Every injury the row receives 2 points (# of injuries in the row * 3) - Column name do be used: 11. NUMBER.OF.PERSONS.INJURED    
++ Every death the row receives 6 points - Column name to be used: 12. NUMBER.OF.PERSONS.KILLED 
+
+A new column with the above point system will be created and called ("URS" = Universal Rating System (for accidents))
+
+```{r}
+
+```
+
+A. Plot simple graph of URS per zip code
+
+```{r}
+
+```
+
+B. Plot a histogram with URS per zip code using the following criteria:
++ X Axis: number of URS (histogram divided into 10 equal intervals depending on the number of max. URS found in graph A - above)
++ Y Axis: number of zip codes that fall into each of the intervals defined in the x-axis
+
+```{r}
+
+```
+
+***
